@@ -1,7 +1,8 @@
 # BenchmarkingDocker: Model Server Benchmarking Suite
 
 This project benchmarks the performance of a machine learning model server under different request strategies and deployment architectures.
-![image](https://github.com/user-attachments/assets/2dc8e36a-ec77-4d46-a0bf-21411b860854)
+![image](https://github.com/user-attachments/assets/39446221-f8bd-4b20-a853-3ee55bba53f1)
+
 
 
 
