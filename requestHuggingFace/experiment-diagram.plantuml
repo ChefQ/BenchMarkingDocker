@@ -1,0 +1,29 @@
+@startuml Benchmarking Hugging Face Model Deployment
+skinparam rectangle {
+  BackgroundColor White
+  BorderColor Black
+}
+
+actor "Benchmark Script" as Benchmark
+
+rectangle "Standalone Server(:8000) \n & \n NGINX(:80) " as Standalone
+
+rectangle "NGINX Reverse Proxy" as NGINX {
+  rectangle "Server 1" as S1
+  rectangle "Server 2" as S2
+  rectangle "Server 3" as S3
+}
+
+' Benchmarking flows
+Benchmark --> Standalone : 1. Single Request
+Benchmark --> Standalone : 2. Sequential Requests
+Benchmark --> Standalone : 3. Parallel Requests\n(ThreadPoolExecutor)
+Benchmark --> Standalone : 4. Parallel Requests\n(asyncio.gather)
+Benchmark --> Standalone : 5. Parallel Requests\n(Multiprocessing)
+
+note right of Standalone
+All requests hit the same
+standalone model server 
+and NGINX server
+end note
+@enduml

@@ -1,0 +1,71 @@
+
+name: NginxNHuggingFace
+services: #Network for each service not explicitly defined, so they will use the default network
+
+#Uncomment the following lines to use a single Hugging Face Inference Server with Nginx
+  app: # DNS will resolve this.
+    build: .
+    container_name: hf-inference-server
+    ports:
+      - "8000:8000" #Host port 8000 to container port 8000
+    environment:
+      - PYTHONPATH=/app
+      - TRANSFORMERS_CACHE=/app/cache
+    volumes:
+      - ./cache:/app/cache  # Cache downloaded models
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 2G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+
+
+  app1:
+    build: .
+    container_name: app1
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./cache:/app/cache
+
+  app2:
+    build: .
+    container_name: app2
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./cache:/app/cache
+
+  app3:
+    build: .
+    container_name: app3
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./cache:/app/cache
+
+  nginx:
+    image: nginx:alpine
+    container_name: hf-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app1
+      - app2
+      - app3
+
+networks:
+  default:
+    driver: bridge # Use bridge network for isolation from host Network but communication between services 
+#                    # bridge a type of many-to-many network

@@ -1,0 +1,27 @@
+@startuml Hugging Face Model Deployment Architecture
+skinparam rectangle {
+    BackgroundColor White
+    BorderColor Black
+}
+
+actor Client as "User / Benchmark Script"
+
+rectangle "NGINX (Reverse Proxy)" as NGINX
+
+package "Docker Network" {
+    rectangle Server1
+    rectangle Server2
+    rectangle Server3
+}
+
+rectangle "Standalone Server" as Standalone
+
+' Arrows
+Client --> NGINX : HTTP (e.g., /models)
+NGINX --> Server1 : Load Balancer
+NGINX --> Server2
+NGINX --> Server3
+
+Client --> Standalone : HTTP (e.g., :8000/models)
+
+@enduml

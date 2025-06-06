@@ -1,0 +1,36 @@
+@startuml Simple Threading Web Scraping Architecture
+        
+' Main components
+file "TXT File\n(2M URLs)" as TXT
+database "SQLite/PostgreSQL\n(URL Queue)" as DB
+rectangle "Main Python Application" as APP {
+  rectangle "URL Manager\n(Main Thread)" as MANAGER
+  rectangle "Thread Pool\n(100-200 threads)" as POOL
+  rectangle "Shared HTTP\nConnection Pool" as HTTP_POOL
+  rectangle "Rate Limiter\n(Per Domain)" as RATE
+  rectangle "Results Writer\n(Background Thread)" as WRITER
+}
+cloud "Target Websites" as WEB
+database "Results Database\n(Scraped Content)" as RESULTS
+
+' Simple flow
+TXT --> DB : Load 2M URLs
+DB --> MANAGER : Read URL batches
+MANAGER --> POOL : Distribute URLs
+POOL --> HTTP_POOL : Get connections
+HTTP_POOL --> RATE : Apply rate limits
+RATE --> WEB : Scrape websites
+WEB --> POOL : Return content
+POOL --> WRITER : Queue results
+WRITER --> RESULTS : Bulk insert
+
+' Notes
+note right of DB : URL status:\npending → processing → completed
+
+note right of POOL : Each thread:\n- Processes 1 URL at a time\n- Shares HTTP connections\n- Updates URL status in DB
+
+note right of HTTP_POOL : Shared across all threads:\n- Connection reuse\n- DNS caching\n- Keep-alive connections
+
+note right of WRITER : Background thread:\n- Batches results for efficiency\n- Non-blocking writes\n- Handles DB commits
+
+@enduml

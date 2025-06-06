@@ -1,0 +1,36 @@
+@startuml Simple Web Scraping Architecture
+
+' Main components
+file "TXT File\n(2M URLs)" as TXT
+database "URL Database\n(Status tracking)" as DB
+rectangle "Docker Compose" as COMPOSE
+rectangle "Container 1" as C1
+rectangle "Container 2" as C2  
+rectangle "Container N" as CN
+cloud "Target Websites" as WEB
+database "Results Database" as RESULTS
+
+' Simple flow
+TXT --> DB : Load URLs
+DB --> COMPOSE : Coordinates
+COMPOSE --> C1
+COMPOSE --> C2
+COMPOSE --> CN
+
+C1 --> DB : Get batch (100 URLs)
+C2 --> DB : Get batch (100 URLs)
+CN --> DB : Get batch (100 URLs)
+
+C1 --> WEB : Scrape websites
+C2 --> WEB : Scrape websites
+CN --> WEB : Scrape websites
+
+C1 --> RESULTS : Store content
+C2 --> RESULTS : Store content
+CN --> RESULTS : Store content
+
+note right of DB : Tracks URL status:\npending → processing → completed
+
+note right of C1 : Each container:\n- Uses threads for scraping\n- Processes 100 URLs at a time\n- Handles rate limiting
+
+@enduml
