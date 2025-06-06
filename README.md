@@ -25,6 +25,17 @@ Running on port 80
 
 ![image](https://github.com/user-attachments/assets/b5ab108d-58dc-47db-8023-260255dc4ed5)
 
+### How to run.
+
+Navigate to the requestHuggingFace folder
+And run docker compose
+```bash
+cd ./requestHuggingFace 
+docker compose up --build
+```
+
+
+
 
 
 
